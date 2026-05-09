@@ -6,6 +6,10 @@
 #   CENTRAL_TOKEN_PASSWORD  — user token password from central.sonatype.com
 #   GPG_PRIVATE_KEY         — armored private key (gpg --armor --export-secret-keys)
 #   GPG_PASSPHRASE          — passphrase for the GPG key
+#
+# After this job succeeds the bundle is validated on central.sonatype.com.
+# Go to https://central.sonatype.com/publishing/deployments and click Publish.
+# The bundle zip is also uploaded as a workflow artifact if you prefer direct upload.
 name: Release
 
 on:
@@ -33,9 +37,17 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
 
-      - name: Deploy to Maven Central
+      - name: Deploy to Maven Central (upload + validate, manual publish)
         run: mvn -B --no-transfer-progress deploy -P release
         env:
           MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Upload bundle as workflow artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: central-bundle
+          path: target/central-publishing/central-bundle.zip
+          if-no-files-found: warn
