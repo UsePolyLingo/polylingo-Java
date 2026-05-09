@@ -1,6 +1,11 @@
-# Deploy to Maven Central (OSSRH) when a version tag is pushed.
-# One-time: Sonatype namespace approval, GPG key, and repo secrets:
-#   OSSRH_USERNAME, OSSRH_PASSWORD, GPG_PRIVATE_KEY, GPG_PASSPHRASE
+# Deploy to Maven Central Portal when a version tag is pushed.
+# One-time setup: register at https://central.sonatype.com, claim namespace
+# com.usepolylingo, generate a user token, generate a GPG key.
+# Required GitHub secrets:
+#   CENTRAL_TOKEN_USERNAME  — user token username from central.sonatype.com
+#   CENTRAL_TOKEN_PASSWORD  — user token password from central.sonatype.com
+#   GPG_PRIVATE_KEY         — armored private key (gpg --armor --export-secret-keys)
+#   GPG_PASSPHRASE          — passphrase for the GPG key
 name: Release
 
 on:
@@ -22,15 +27,15 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-          server-id: ossrh
+          server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
 
-      - name: Deploy to OSSRH
+      - name: Deploy to Maven Central
         run: mvn -B --no-transfer-progress deploy -P release
         env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
