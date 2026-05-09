@@ -120,7 +120,7 @@ class PolyLingoTest {
         new MockResponse()
             .setResponseCode(200)
             .setBody(
-                "{\"usage\":{\"period_start\":\"2025-03-01\",\"period_end\":\"2025-03-31\",\"translations_used\":0,\"translations_limit\":null,\"tokens_used\":100,\"tokens_limit\":100000}}}"));
+                "{\"usage\":{\"period_start\":\"2025-03-01\",\"period_end\":\"2025-03-31\",\"translations_used\":0,\"translations_limit\":null,\"tokens_used\":100,\"tokens_limit\":100000}}"));
 
     UsageResponse u = client().usage();
     assertEquals(100, u.getUsage().getTokensUsed());
@@ -197,7 +197,6 @@ class PolyLingoTest {
     assertEquals("hallo", r.getTranslations().get("de"));
     assertTrue(progressCalls.get() >= 1);
     assertEquals("/v1/jobs", server.takeRequest().getPath());
-    assertEquals("/v1/jobs/j1", server.takeRequest().getPath());
     assertEquals("/v1/jobs/j1", server.takeRequest().getPath());
     assertEquals("/v1/jobs/j1", server.takeRequest().getPath());
   }
